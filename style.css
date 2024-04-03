@@ -45,10 +45,10 @@ button {
     10% {
         transform: translateY(-10vh) rotate(0deg); /* Começando a 10% da altura da viewport */
     }
-    70% {
+    92% {
         transform: translateY(100vh) rotate(360deg); /* Chegando a 100% da altura da viewport */
     }
-    100% {
+    95% {
         transform: translateY(100vh) rotate(720deg);
     }
 }
