@@ -25,6 +25,46 @@ botaoConverter.addEventListener("click", converter);
 const botaoLimpar = document.getElementById("botao-limpar");
 botaoLimpar.addEventListener("click", limpar);
 
+const botaoAceitaMensagem = document.getElementById("botao-aceita-mensagem");
+botaoAceitaMensagem.addEventListener("click", aceitarMensagem);
+
+console.log(localStorage);
+
+if(localStorage.getItem("aceitouCookie") == "Ok, estou de acordo!") {
+    const divMensagemUsuario = document.getElementById("mensagem-usuario");
+    divMensagemUsuario.classList.add("oculto");
+}
+
+let ultimoResultado = "";
+
+const valorEntrada = document.getElementById("valorEntrada");
+valorEntrada.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        converter();
+    }
+});
+
+document.addEventListener("keydown", function(event) { //document quando queremos retirar a função "externa" do comando
+    if (event.ctrlKey && event.key === "l") {
+        limpar();
+        event.preventDefault();
+    }
+});
+
+document.addEventListener("keydown", function(event) {
+    if (event.ctrlKey && event.key === "i") {
+        inverter();
+        event.preventDefault();
+    }
+});
+
+document.addEventListener("keydown", function(event) {
+    if (event.ctrlKey && event.key === "z") {
+        ultimoResultado();
+        event.preventDefault();
+    }
+});
+
 function limpar() {
     let paragrafoResultado = document.getElementById("resultado");
     paragrafoResultado.textContent = "";
@@ -40,7 +80,16 @@ function inverter() {
     document.getElementById("moeda2").value = valorMoeda1;
 }
 
+function aceitarMensagem() {
+    const divMensagemUsuario = document.getElementById("mensagem-usuario");
+    divMensagemUsuario.classList.add("oculto")
+
+    localStorage.setItem("aceitouCookie", "Ok, estou de acordo!");
+}
+
 function converter() {
+    let historicoRecuperado = recuperaHistorico();
+    
     let valorUsuario = document.getElementById("valorEntrada").value;
 
     if(valorUsuario == 0 || valorUsuario == "") {
@@ -62,15 +111,76 @@ function converter() {
     let resultado = valorUsuario * valoresConversao[moeda1][moeda2];
 
 
+    function salvarResultadoLocalStorage(resultado) {
+
+    }
+
     let paragrafoResultado = document.getElementById("resultado");
     paragrafoResultado.textContent = simbolo + " " + resultado.toFixed(2);
 
+    let objetoResultado = {
+        valorDoUsuario: valorUsuario,
+        valorMoeda1: moeda1,
+        valorMoeda2: moeda2,
+        valorResultado: resultado.toFixed(2)
+    }
+        //console.log(objetoResultado);
+
+        
+       // let objetoResultadoJSON = JSON.stringify(objetoResultado);
+
+        //localStorage.setItem("historico", objetoResultadoJSON);
+
+        //Converter Objeto JS para texto (JSON) antes de abrir no LocalStorage
+        //localStorage.setItem("historico", objetoResultado)
+
+    function recuperaHistorico() {
+        let historico = localStorage.getItem("historico");
+
+        if (!historico) {
+            return[];
+        }
+
+        let historicoObjeto = JSON.parse(historico);
+
+        return historicoObjeto;
+    }
+
+    function salvarHistorico(conversao) {
+        let historico = recuperaHistorico();
+        historico.push(conversao);
+        historico = JSON.stringify(historico);
+        localStorage.setItem("historico", historico);
+    }
+
+    salvarHistorico(objetoResultado);
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    
+    
     // Remover moedas existentes antes de adicionar novas
     const moedasContainer = document.getElementById("moedas");
     moedasContainer.innerHTML = "";
 
     // Adicionando moedas ao container de acordo com o valor digitado pelo usuário
-    const numeroMoedas = Math.min(valorUsuario, 200); // Limitando a um máximo de 1000 moedas
+    const numeroMoedas = Math.min(valorUsuario, 30); // Limitando a um máximo de 1000 moedas
     for (let i = 0; i < numeroMoedas; i++) {
         const moeda = document.createElement("div");
         moeda.classList.add("moeda");
