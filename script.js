@@ -16,6 +16,12 @@ const valoresConversao = {
     }
 }
 
+const relacaoNomesMoedas = {
+    real: "BRL",
+    dolar: "USD",
+    euro: "EUR"
+}
+
 const botaoInverter = document.getElementById("botao-inverter");
 botaoInverter.addEventListener("click", inverter);
 
@@ -34,6 +40,37 @@ if(localStorage.getItem("aceitouCookie") == "Ok, estou de acordo!") {
     const divMensagemUsuario = document.getElementById("mensagem-usuario");
     divMensagemUsuario.classList.add("oculto");
 }
+
+function buscarConversaoAPI(moedaOrigem, moedaDestino) {
+
+    let urlApi = "https://economia.awesomeapi.com.br/json/last/";
+    urlApi = urlApi + moedaOrigem + "-" + moedaDestino;
+
+    var responseAPI = "";
+    
+    fetch(urlApi).then(function (response){
+       if(response.status == 200) {
+        console.log("A chamada foi feita com sucesso!")
+       }
+    
+       return response.json();
+
+    }).then(function(data){
+       let objetoEmJson = JSON.stringify(data);
+        console.log(data[moedaOrigem + moedaDestino]);
+        console.log(data[moedaOrigem + moedaDestino]["ask"]);
+        console.log(objetoEmJson);
+
+        responseAPI = data[moedaOrigem + moedaDestino]["ask"];
+
+    }).catch(function(error){
+        console.log(error);
+    })
+
+    console.log("Antes do retorno" + responseAPI);
+    return responseAPI;
+}
+ 
 
 let ultimoResultado = "";
 
@@ -88,6 +125,7 @@ function aceitarMensagem() {
 }
 
 function converter() {
+
     let historicoRecuperado = recuperaHistorico();
     
     let valorUsuario = document.getElementById("valorEntrada").value;
@@ -100,14 +138,22 @@ function converter() {
     let moeda1 = document.getElementById("moeda1").value;
     let moeda2 = document.getElementById("moeda2").value;
 
+    console.log(moeda1);
+    console.log(moeda2);
+
+    console.log(relacaoNomesMoedas[moeda1]);
+    console.log(relacaoNomesMoedas[moeda2]);
+
     if (moeda1 == moeda2) {
         alert("Moedas iguais!!");
         return;
     }
 
-    let simbolo = valoresConversao[moeda2]["simbolo"];
-    //console.log(simbolo);
+    let parametrosConversao = buscarConversaoAPI(relacaoNomesMoedas[moeda1], relacaoNomesMoedas[moeda2]);
 
+    console.log(parametrosConversao);
+
+    let simbolo = valoresConversao[moeda2]["simbolo"];
     let resultado = valorUsuario * valoresConversao[moeda1][moeda2];
 
 
